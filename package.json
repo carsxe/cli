@@ -1,0 +1,56 @@
+{
+  "name": "@carsxe/cli",
+  "version": "1.0.0",
+  "description": "CarsXE API command-line interface — query vehicle data from your terminal or AI agent",
+  "bin": {
+    "carsxe": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint --config ../../tooling/eslint-config/index.js src --ext .ts",
+    "test": "echo \"No tests yet\"",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "carsxe",
+    "vehicle",
+    "vin",
+    "cli",
+    "automotive",
+    "car",
+    "plate decoder",
+    "vehicle history",
+    "vehicle specs"
+  ],
+  "author": "CarsXE",
+  "license": "MIT",
+  "homepage": "https://api.carsxe.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carsxe/carsxe-api-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/carsxe/carsxe-api-cli/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "dependencies": {
+    "cli-table3": "^0.6.5",
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
+  }
+}
