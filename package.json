@@ -30,10 +30,10 @@
   "homepage": "https://api.carsxe.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/carsxe/carsxe-api-cli.git"
+    "url": "git+https://github.com/carsxe/cli.git"
   },
   "bugs": {
-    "url": "https://github.com/carsxe/carsxe-api-cli/issues"
+    "url": "https://github.com/carsxe/cli/issues"
   },
   "engines": {
     "node": ">=22"
