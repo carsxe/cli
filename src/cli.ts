@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command, Option } from "commander";
-const { version } = require("../package.json") as { version: string };
+import { version } from "../package.json";
 import { api } from "./api";
 import { renderTable } from "./table";
 import {
