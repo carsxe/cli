@@ -1,6 +1,7 @@
 import type { APITypes } from "./types";
 
 const BASE_URL = "https://api.carsxe.com";
+const SOURCE = "cli";
 const TIMEOUT_MS = 30_000;
 
 type Params = Record<string, string | undefined>;
@@ -12,7 +13,7 @@ function buildUrl(
 ): string {
   const url = new URL(`${BASE_URL}/${endpoint}`);
   url.searchParams.set("key", apiKey);
-  url.searchParams.set("source", "cli");
+  url.searchParams.set("source", SOURCE);
   for (const [k, v] of Object.entries(params)) {
     if (v !== undefined) url.searchParams.set(k, v);
   }
