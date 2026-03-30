@@ -1,6 +1,6 @@
 {
   "name": "@carsxe/cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CarsXE API command-line interface — query vehicle data from your terminal or AI agent",
   "bin": {
     "carsxe": "./dist/cli.js"
@@ -9,7 +9,7 @@
     "build": "tsc",
     "dev": "ts-node src/cli.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint --config ../../tooling/eslint-config/index.js src --ext .ts",
+    "lint": "eslint src --ext .ts",
     "test": "echo \"No tests yet\"",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run build"
