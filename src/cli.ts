@@ -59,7 +59,7 @@ async function run(
 program
   .name("carsxe")
   .description("CarsXE API command-line interface")
-  .version(version)
+  .version(version, "-v, --version")
   .addHelpText(
     "after",
     "\nRun `carsxe <command> --help` to see all options for a command.\nExample: carsxe images --help",

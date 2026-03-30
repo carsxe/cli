@@ -28,32 +28,37 @@ Your key is saved and used automatically for every command from that point on.
 
 ### Where the key is stored
 
-| OS | Path |
-|----|------|
-| Linux / macOS | `~/.carsxe/config.json` |
-| Windows | `C:\Users\<YourName>\.carsxe\config.json` |
+| OS            | Path                                      |
+| ------------- | ----------------------------------------- |
+| Linux / macOS | `~/.carsxe/config.json`                   |
+| Windows       | `C:\Users\<YourName>\.carsxe\config.json` |
 
 ### Using an environment variable instead
 
 If you prefer not to save the key to disk, set the `CARSXE_API_KEY` environment variable:
 
 **Linux / macOS (bash/zsh)**
+
 ```bash
 export CARSXE_API_KEY=YOUR_API_KEY
 ```
+
 To make it permanent, add that line to your `~/.bashrc`, `~/.zshrc`, or `~/.profile`.
 
 **Windows — Command Prompt**
+
 ```cmd
 set CARSXE_API_KEY=YOUR_API_KEY
 ```
 
 **Windows — PowerShell**
+
 ```powershell
 $env:CARSXE_API_KEY = "YOUR_API_KEY"
 ```
 
 To make it permanent on Windows, run:
+
 ```powershell
 [System.Environment]::SetEnvironmentVariable("CARSXE_API_KEY", "YOUR_API_KEY", "User")
 ```
@@ -68,12 +73,12 @@ To make it permanent on Windows, run:
 
 These options apply to every command:
 
-| Option | Description |
-|--------|-------------|
-| `--table` | Output as a formatted table instead of JSON |
-| `--raw` | Output compact single-line JSON |
-| `-V, --version` | Print version number |
-| `-h, --help` | Display help |
+| Option          | Description                                 |
+| --------------- | ------------------------------------------- |
+| `--table`       | Output as a formatted table instead of JSON |
+| `--raw`         | Output compact single-line JSON             |
+| `-v, --version` | Print version number                        |
+| `-h, --help`    | Display help                                |
 
 > **Tip:** Run `carsxe <command> --help` to see all options for any command.
 
@@ -89,13 +94,14 @@ Decode a VIN and get full vehicle specifications (make, model, year, engine, tri
 carsxe specs --vin <vin> [--deep-data] [--disable-int-vin]
 ```
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `--vin <vin>` | Yes | Vehicle Identification Number |
-| `--deep-data` | No | Enable deep data (additional equipment details) |
-| `--disable-int-vin` | No | Disable international VIN decoding fallback |
+| Option              | Required | Description                                     |
+| ------------------- | -------- | ----------------------------------------------- |
+| `--vin <vin>`       | Yes      | Vehicle Identification Number                   |
+| `--deep-data`       | No       | Enable deep data (additional equipment details) |
+| `--disable-int-vin` | No       | Disable international VIN decoding fallback     |
 
 **Example:**
+
 ```bash
 carsxe specs --vin 1HGBH41JXMN109186
 ```
@@ -110,11 +116,12 @@ Get the current estimated market value of a vehicle.
 carsxe market-value --vin <vin>
 ```
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `--vin <vin>` | Yes | Vehicle Identification Number |
+| Option        | Required | Description                   |
+| ------------- | -------- | ----------------------------- |
+| `--vin <vin>` | Yes      | Vehicle Identification Number |
 
 **Example:**
+
 ```bash
 carsxe market-value --vin 1HGBH41JXMN109186
 ```
@@ -129,11 +136,12 @@ Get a full vehicle history report including past owners, accidents, title status
 carsxe history --vin <vin>
 ```
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `--vin <vin>` | Yes | Vehicle Identification Number |
+| Option        | Required | Description                   |
+| ------------- | -------- | ----------------------------- |
+| `--vin <vin>` | Yes      | Vehicle Identification Number |
 
 **Example:**
+
 ```bash
 carsxe history --vin 1HGBH41JXMN109186
 ```
@@ -148,11 +156,12 @@ Check for open safety recalls on a vehicle.
 carsxe recalls --vin <vin>
 ```
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `--vin <vin>` | Yes | Vehicle Identification Number |
+| Option        | Required | Description                   |
+| ------------- | -------- | ----------------------------- |
+| `--vin <vin>` | Yes      | Vehicle Identification Number |
 
 **Example:**
+
 ```bash
 carsxe recalls --vin 1HGBH41JXMN109186
 ```
@@ -167,11 +176,12 @@ Check whether a vehicle has active liens or has been reported stolen.
 carsxe lien-theft --vin <vin>
 ```
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `--vin <vin>` | Yes | Vehicle Identification Number |
+| Option        | Required | Description                   |
+| ------------- | -------- | ----------------------------- |
+| `--vin <vin>` | Yes      | Vehicle Identification Number |
 
 **Example:**
+
 ```bash
 carsxe lien-theft --vin 1HGBH41JXMN109186
 ```
@@ -186,11 +196,12 @@ Decode a VIN from a non-US vehicle (European, Asian, and other markets).
 carsxe international-vin --vin <vin>
 ```
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `--vin <vin>` | Yes | Vehicle Identification Number |
+| Option        | Required | Description                   |
+| ------------- | -------- | ----------------------------- |
+| `--vin <vin>` | Yes      | Vehicle Identification Number |
 
 **Example:**
+
 ```bash
 carsxe international-vin --vin WBAFR7C57CC811956
 ```
@@ -205,14 +216,15 @@ Look up vehicle information from a license plate number.
 carsxe plate-decoder --plate <plate> --country <country> [--state <state>] [--district <district>]
 ```
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `--plate <plate>` | Yes | License plate number |
-| `--country <country>` | Yes | Country code (e.g. `US`, `GB`, `DE`, `CA`) |
-| `--state <state>` | No | State or province code (e.g. `CA`, `TX`, `ON`) |
-| `--district <district>` | No | District or region |
+| Option                  | Required | Description                                    |
+| ----------------------- | -------- | ---------------------------------------------- |
+| `--plate <plate>`       | Yes      | License plate number                           |
+| `--country <country>`   | Yes      | Country code (e.g. `US`, `GB`, `DE`, `CA`)     |
+| `--state <state>`       | No       | State or province code (e.g. `CA`, `TX`, `ON`) |
+| `--district <district>` | No       | District or region                             |
 
 **Example:**
+
 ```bash
 carsxe plate-decoder --plate ABC1234 --country US --state CA
 ```
@@ -227,11 +239,12 @@ Extract and decode a license plate from an image URL.
 carsxe plate-image --image <url>
 ```
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `--image <url>` | Yes | Publicly accessible URL of the image |
+| Option          | Required | Description                          |
+| --------------- | -------- | ------------------------------------ |
+| `--image <url>` | Yes      | Publicly accessible URL of the image |
 
 **Example:**
+
 ```bash
 carsxe plate-image --image https://example.com/car-photo.jpg
 ```
@@ -246,11 +259,12 @@ Extract a VIN from a photo of a VIN plate or dashboard sticker.
 carsxe vin-ocr --image <url>
 ```
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `--image <url>` | Yes | Publicly accessible URL of the image |
+| Option          | Required | Description                          |
+| --------------- | -------- | ------------------------------------ |
+| `--image <url>` | Yes      | Publicly accessible URL of the image |
 
 **Example:**
+
 ```bash
 carsxe vin-ocr --image https://example.com/vin-sticker.jpg
 ```
@@ -265,14 +279,15 @@ Look up vehicle data when you don't have a VIN — search by year, make, and mod
 carsxe ymm --year <year> --make <make> --model <model> [--trim <trim>]
 ```
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `--year <year>` | Yes | Model year (e.g. `2020`) |
-| `--make <make>` | Yes | Vehicle make (e.g. `Toyota`) |
-| `--model <model>` | Yes | Vehicle model (e.g. `Camry`) |
-| `--trim <trim>` | No | Trim level (e.g. `LE`, `XSE`) |
+| Option            | Required | Description                   |
+| ----------------- | -------- | ----------------------------- |
+| `--year <year>`   | Yes      | Model year (e.g. `2020`)      |
+| `--make <make>`   | Yes      | Vehicle make (e.g. `Toyota`)  |
+| `--model <model>` | Yes      | Vehicle model (e.g. `Camry`)  |
+| `--trim <trim>`   | No       | Trim level (e.g. `LE`, `XSE`) |
 
 **Example:**
+
 ```bash
 carsxe ymm --year 2020 --make Toyota --model Camry --trim LE
 ```
@@ -287,18 +302,19 @@ Retrieve photos of a vehicle by make, model, and year.
 carsxe images --make <make> --model <model> [options]
 ```
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `--make <make>` | Yes | Vehicle make (e.g. `Toyota`) |
-| `--model <model>` | Yes | Vehicle model (e.g. `Camry`) |
-| `--year <year>` | No | Model year |
-| `--trim <trim>` | No | Trim level |
-| `--color <color>` | No | Vehicle color |
-| `--angle <angle>` | No | Photo angle: `front` \| `side` \| `back` |
-| `--photo-type <type>` | No | Photo type: `interior` \| `exterior` \| `engine` |
-| `--size <size>` | No | Image size: `Small` \| `Medium` \| `Large` \| `Wallpaper` \| `All` |
+| Option                | Required | Description                                                        |
+| --------------------- | -------- | ------------------------------------------------------------------ |
+| `--make <make>`       | Yes      | Vehicle make (e.g. `Toyota`)                                       |
+| `--model <model>`     | Yes      | Vehicle model (e.g. `Camry`)                                       |
+| `--year <year>`       | No       | Model year                                                         |
+| `--trim <trim>`       | No       | Trim level                                                         |
+| `--color <color>`     | No       | Vehicle color                                                      |
+| `--angle <angle>`     | No       | Photo angle: `front` \| `side` \| `back`                           |
+| `--photo-type <type>` | No       | Photo type: `interior` \| `exterior` \| `engine`                   |
+| `--size <size>`       | No       | Image size: `Small` \| `Medium` \| `Large` \| `Wallpaper` \| `All` |
 
 **Example:**
+
 ```bash
 carsxe images --make Toyota --model Camry --year 2020 --angle front --size Large
 ```
@@ -313,11 +329,12 @@ Decode a diagnostic trouble code (DTC) from your OBD-II scanner.
 carsxe obd --code <code>
 ```
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `--code <code>` | Yes | OBD-II code (e.g. `P0300`, `C1234`, `B0001`, `U0100`) |
+| Option          | Required | Description                                           |
+| --------------- | -------- | ----------------------------------------------------- |
+| `--code <code>` | Yes      | OBD-II code (e.g. `P0300`, `C1234`, `B0001`, `U0100`) |
 
 **Example:**
+
 ```bash
 carsxe obd --code P0300
 ```
@@ -335,6 +352,7 @@ carsxe config remove-key          # Remove saved key
 ```
 
 **Examples:**
+
 ```bash
 carsxe config set-key abc123xyz
 # API key saved to ~/.carsxe/config.json   (Linux/macOS)
@@ -360,6 +378,7 @@ By default all commands output pretty-printed JSON.
 ```bash
 carsxe --table obd --code P0300
 ```
+
 ```
 ┌──────────────────────┬────────────────────────────────────────┐
 │ Field                │ Value                                  │
@@ -376,11 +395,13 @@ Nested objects are flattened with dot notation (e.g. `engine.cylinders`). Arrays
 **Raw JSON** — use `--raw` for compact single-line JSON, useful for piping to `jq` or scripts:
 
 **Linux / macOS**
+
 ```bash
 carsxe --raw specs --vin 1HGBH41JXMN109186 | jq '.make'
 ```
 
 **Windows (PowerShell)**
+
 ```powershell
 carsxe --raw specs --vin 1HGBH41JXMN109186 | ConvertFrom-Json | Select-Object -ExpandProperty make
 ```
@@ -389,10 +410,10 @@ carsxe --raw specs --vin 1HGBH41JXMN109186 | ConvertFrom-Json | Select-Object -E
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | Success |
-| `1` | API error, HTTP error, or missing API key |
+| Code | Meaning                                   |
+| ---- | ----------------------------------------- |
+| `0`  | Success                                   |
+| `1`  | API error, HTTP error, or missing API key |
 
 ---
 
