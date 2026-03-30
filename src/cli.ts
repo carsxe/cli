@@ -2,14 +2,14 @@
 import { Command, Option } from "commander";
 import { version } from "../package.json";
 import { api } from "./api";
-import { renderTable } from "./table";
 import {
-  getSavedKey,
-  setSavedKey,
-  removeSavedKey,
-  maskKey,
   configFilePath,
+  getSavedKey,
+  maskKey,
+  removeSavedKey,
+  setSavedKey,
 } from "./config";
+import { renderTable } from "./table";
 
 const program = new Command();
 
@@ -59,7 +59,6 @@ async function run(
 program
   .name("carsxe")
   .description("CarsXE API command-line interface")
-  .version(version, "-v, --version")
   .addHelpText(
     "after",
     "\nRun `carsxe <command> --help` to see all options for a command.\nExample: carsxe images --help",
@@ -72,7 +71,8 @@ program
       "--table",
       "Output as a formatted table instead of JSON",
     ).default(false),
-  );
+  )
+  .version(version, "-v, --version");
 
 // ── config ─────────────────────────────────────────────────────────────────
 
