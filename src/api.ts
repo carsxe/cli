@@ -81,8 +81,21 @@ export const api: APITypes = {
   ) {
     return doGet(key, "specs", { vin, deepdata, disableIntVINDecoding });
   },
-  marketValue(key: string, vin: string) {
-    return doGet(key, "v2/marketvalue", { vin });
+  marketValue(
+    key: string,
+    vin: string,
+    mileage?: string,
+    state?: string,
+    condition?: string,
+    country?: string,
+  ) {
+    return doGet(key, "v2/marketvalue", {
+      vin,
+      mileage,
+      state,
+      condition,
+      country,
+    });
   },
   history(key: string, vin: string) {
     return doGet(key, "history", { vin });

@@ -1,6 +1,6 @@
 {
   "name": "@carsxe/cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "CarsXE API command-line interface — query vehicle data from your terminal or AI agent",
   "bin": {
     "carsxe": "./dist/cli.js"

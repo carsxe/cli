@@ -145,9 +145,31 @@ program
   .command("market-value")
   .description("Get current market value of a vehicle from a VIN")
   .requiredOption("--vin <vin>", "Vehicle Identification Number")
+  .option("--mileage <mileage>", "Current odometer reading in miles")
+  .option(
+    "--state <state>",
+    "Two-letter US state code for regional pricing (e.g. CA, TX)",
+  )
+  .option(
+    "--condition <condition>",
+    "Vehicle condition: excellent | clean | average | rough",
+  )
+  .option("--country <country>", "Country code for pricing (default: US)")
   .action(async (opts, cmd) => {
     const { raw, table } = cmd.parent.opts();
-    await run((k) => api.marketValue(k, opts.vin), raw, table);
+    await run(
+      (k) =>
+        api.marketValue(
+          k,
+          opts.vin,
+          opts.mileage,
+          opts.state,
+          opts.condition,
+          opts.country,
+        ),
+      raw,
+      table,
+    );
   });
 
 // ── history ────────────────────────────────────────────────────────────────

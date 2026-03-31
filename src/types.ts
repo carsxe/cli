@@ -5,7 +5,14 @@ export type APITypes = {
     deepdata?: string,
     disableIntVINDecoding?: string,
   ): Promise<unknown>;
-  marketValue(key: string, vin: string): Promise<unknown>;
+  marketValue(
+    key: string,
+    vin: string,
+    mileage?: string,
+    state?: string,
+    condition?: string,
+    country?: string,
+  ): Promise<unknown>;
   history(key: string, vin: string): Promise<unknown>;
   recalls(key: string, vin: string): Promise<unknown>;
   internationalVin(key: string, vin: string): Promise<unknown>;
