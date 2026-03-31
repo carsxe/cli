@@ -113,17 +113,21 @@ carsxe specs --vin 1HGBH41JXMN109186
 Get the current estimated market value of a vehicle.
 
 ```bash
-carsxe market-value --vin <vin>
+carsxe market-value --vin <vin> [--mileage <mileage>] [--state <state>] [--condition <condition>] [--country <country>]
 ```
 
-| Option        | Required | Description                   |
-| ------------- | -------- | ----------------------------- |
-| `--vin <vin>` | Yes      | Vehicle Identification Number |
+| Option                    | Required | Description                                                        |
+| ------------------------- | -------- | ------------------------------------------------------------------ |
+| `--vin <vin>`             | Yes      | Vehicle Identification Number                                      |
+| `--mileage <mileage>`     | No       | Current odometer reading in miles                                  |
+| `--state <state>`         | No       | Two-letter US state code for regional pricing (e.g. `CA`, `TX`) |
+| `--condition <condition>` | No       | Vehicle condition: `excellent` \| `clean` \| `average` \| `rough` |
+| `--country <country>`     | No       | Country code for pricing (default: `US`)                           |
 
 **Example:**
 
 ```bash
-carsxe market-value --vin 1HGBH41JXMN109186
+carsxe market-value --vin 1HGBH41JXMN109186 --mileage 45000 --state CA --condition clean
 ```
 
 ---
