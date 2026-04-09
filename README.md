@@ -116,13 +116,13 @@ Get the current estimated market value of a vehicle.
 carsxe market-value --vin <vin> [--mileage <mileage>] [--state <state>] [--condition <condition>] [--country <country>]
 ```
 
-| Option                    | Required | Description                                                        |
-| ------------------------- | -------- | ------------------------------------------------------------------ |
-| `--vin <vin>`             | Yes      | Vehicle Identification Number                                      |
-| `--mileage <mileage>`     | No       | Current odometer reading in miles                                  |
-| `--state <state>`         | No       | Two-letter US state code for regional pricing (e.g. `CA`, `TX`) |
+| Option                    | Required | Description                                                       |
+| ------------------------- | -------- | ----------------------------------------------------------------- |
+| `--vin <vin>`             | Yes      | Vehicle Identification Number                                     |
+| `--mileage <mileage>`     | No       | Current odometer reading in miles                                 |
+| `--state <state>`         | No       | Two-letter US state code for regional pricing (e.g. `CA`, `TX`)   |
 | `--condition <condition>` | No       | Vehicle condition: `excellent` \| `clean` \| `average` \| `rough` |
-| `--country <country>`     | No       | Country code for pricing (default: `US`)                           |
+| `--country <country>`     | No       | Country code for pricing (default: `US`)                          |
 
 **Example:**
 
