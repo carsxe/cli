@@ -1,6 +1,6 @@
 {
   "name": "@carsxe/cli",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "CarsXE API command-line interface — query vehicle data from your terminal or AI agent",
   "bin": {
     "carsxe": "./dist/cli.js"
@@ -43,7 +43,8 @@
   ],
   "dependencies": {
     "cli-table3": "^0.6.5",
-    "commander": "^12.0.0"
+    "commander": "^12.0.0",
+    "open": "11.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

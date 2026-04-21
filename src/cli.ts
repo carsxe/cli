@@ -1,5 +1,7 @@
 #!/usr/bin/env node
+import * as fs from "fs";
 import { Command, Option } from "commander";
+import { browserLogin } from "./browser-auth";
 import { version } from "../package.json";
 import { api } from "./api";
 import {
@@ -12,7 +14,6 @@ import {
 import { renderTable } from "./table";
 
 const program = new Command();
-
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 function resolveKey(): string {
@@ -56,6 +57,35 @@ async function run(
 
 // ── Global options ─────────────────────────────────────────────────────────
 
+/**
+ * Opens a URL in the user's default browser.
+ *
+ * WSL (Windows Subsystem for Linux) has no GUI/display server, so
+ * xdg-open (used by the 'open' package) fails silently. Instead, we
+ * call cmd.exe /c start directly, which invokes the Windows browser.
+ */
+async function openBrowser(url: string): Promise<void> {
+  const isWsl =
+    process.platform === "linux" &&
+    (process.env.WSL_DISTRO_NAME !== undefined ||
+      process.env.WSLENV !== undefined ||
+      (fs.existsSync("/proc/version") &&
+        fs
+          .readFileSync("/proc/version", "utf8")
+          .toLowerCase()
+          .includes("microsoft")));
+
+  if (isWsl) {
+    const { default: cp } = await import("child_process");
+    const escaped = url.replace(/&/g, "^&");
+    cp.spawn("cmd.exe", ["/c", "start", "", escaped], { stdio: "ignore" });
+    return;
+  }
+
+  const { default: open } = await import("open");
+  await open(url);
+}
+
 program
   .name("carsxe")
   .description("CarsXE API command-line interface")
@@ -73,6 +103,33 @@ program
     ).default(false),
   )
   .version(version, "-v, --version");
+
+// ── login ──────────────────────────────────────────────────────────────────
+
+program
+  .command("login")
+  .description("Authorize via browser and save your API key automatically")
+  .action(async () => {
+    try {
+      const { apiKey, teamName } = await browserLogin({
+        onOpen: async (url) => {
+          await openBrowser(url);
+          console.log(
+            "Opening browser to authorize... waiting for confirmation",
+          );
+        },
+      });
+
+      setSavedKey(apiKey);
+      console.log(`✓ Authorized as ${teamName}`);
+      console.log(`API key saved to ${configFilePath()}`);
+      process.exit(0);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`Error: ${msg}`);
+      process.exit(1);
+    }
+  });
 
 // ── config ─────────────────────────────────────────────────────────────────
 

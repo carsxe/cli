@@ -9,7 +9,7 @@ interface Config {
   apiKey?: string;
 }
 
-export function readConfig(): Config {
+function readConfig(): Config {
   try {
     const raw = fs.readFileSync(CONFIG_FILE, 'utf8');
     return JSON.parse(raw) as Config;
@@ -18,7 +18,7 @@ export function readConfig(): Config {
   }
 }
 
-export function writeConfig(config: Config): void {
+function writeConfig(config: Config): void {
   fs.mkdirSync(CONFIG_DIR, { recursive: true, mode: 0o700 });
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), { encoding: 'utf8', mode: 0o600 });
   try {
@@ -30,7 +30,7 @@ export function writeConfig(config: Config): void {
 }
 
 export function getSavedKey(): string | undefined {
-  return readConfig().apiKey;
+  return process.env.CARSXE_API_KEY ?? readConfig().apiKey;
 }
 
 export function setSavedKey(apiKey: string): void {

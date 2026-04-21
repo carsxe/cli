@@ -12,52 +12,41 @@ Command-line interface for the [CarsXE API](https://api.carsxe.com). Query vehic
 npm install -g @carsxe/cli
 ```
 
-This works the same on Linux, macOS, and Windows.
+This works the same on Linux, macOS, and Windows (including WSL).
 
 ---
 
 ## Setup
 
-Get your API key at [api.carsxe.com](https://api.carsxe.com), then save it once:
+### Option 1 — Browser login (recommended)
+
+Run once and your API key is saved automatically:
+
+```bash
+carsxe login
+```
+
+This opens your browser to [api.carsxe.com](https://api.carsxe.com), authenticates you, and saves your key to `~/.carsxe/config.json`. It is used automatically for every command from that point on.
+
+### Option 2 — Set the key manually
+
+Paste your API key from [api.carsxe.com/dashboard/developer](https://api.carsxe.com/dashboard/developer):
 
 ```bash
 carsxe config set-key YOUR_API_KEY
 ```
 
-Your key is saved and used automatically for every command from that point on.
+### Option 3 — Environment variable
 
-### Where the key is stored
+Set `CARSXE_API_KEY` before running any command. This takes precedence over the saved config file.
 
-| OS            | Path                                      |
-| ------------- | ----------------------------------------- |
-| Linux / macOS | `~/.carsxe/config.json`                   |
-| Windows       | `C:\Users\<YourName>\.carsxe\config.json` |
-
-### Using an environment variable instead
-
-If you prefer not to save the key to disk, set the `CARSXE_API_KEY` environment variable:
-
-**Linux / macOS (bash/zsh)**
+**Linux / macOS**
 
 ```bash
 export CARSXE_API_KEY=YOUR_API_KEY
 ```
 
-To make it permanent, add that line to your `~/.bashrc`, `~/.zshrc`, or `~/.profile`.
-
-**Windows — Command Prompt**
-
-```cmd
-set CARSXE_API_KEY=YOUR_API_KEY
-```
-
-**Windows — PowerShell**
-
-```powershell
-$env:CARSXE_API_KEY = "YOUR_API_KEY"
-```
-
-To make it permanent on Windows, run:
+**Windows (PowerShell — permanent)**
 
 ```powershell
 [System.Environment]::SetEnvironmentVariable("CARSXE_API_KEY", "YOUR_API_KEY", "User")
@@ -65,7 +54,7 @@ To make it permanent on Windows, run:
 
 ### Priority order
 
-`CARSXE_API_KEY` env var takes precedence over the saved config file.
+`CARSXE_API_KEY` env var takes precedence over `~/.carsxe/config.json`.
 
 ---
 
@@ -85,6 +74,48 @@ These options apply to every command:
 ---
 
 ## Commands
+
+### `login` — Browser Login
+
+Authorize via browser and save your API key automatically.
+
+```bash
+carsxe login
+```
+
+Opens [api.carsxe.com/cli-auth](https://api.carsxe.com/cli-auth) in your browser. Sign in with your CarsXE account, the tab closes itself, and your API key is saved to `~/.carsxe/config.json` — no copy-pasting needed.
+
+Works on Windows, macOS, Linux, and WSL.
+
+---
+
+### `config` — Configuration
+
+Manage your saved API key.
+
+```bash
+carsxe config set-key <api-key>   # Save API key
+carsxe config get-key             # Show active key and its source
+carsxe config remove-key          # Remove saved key
+```
+
+**Examples:**
+
+```bash
+carsxe config set-key abc123xyz
+# API key saved to ~/.carsxe/config.json   (Linux/macOS)
+# API key saved to C:\Users\You\.carsxe\config.json   (Windows)
+# Key: abc1...3xyz
+
+carsxe config get-key
+# Source : ~/.carsxe/config.json
+# Key    : abc1...3xyz
+
+carsxe config remove-key
+# API key removed.
+```
+
+---
 
 ### `specs` — Vehicle Specifications
 
@@ -341,34 +372,6 @@ carsxe obd --code <code>
 
 ```bash
 carsxe obd --code P0300
-```
-
----
-
-### `config` — Configuration
-
-Manage your saved API key.
-
-```bash
-carsxe config set-key <api-key>   # Save API key
-carsxe config get-key             # Show active key and its source
-carsxe config remove-key          # Remove saved key
-```
-
-**Examples:**
-
-```bash
-carsxe config set-key abc123xyz
-# API key saved to ~/.carsxe/config.json   (Linux/macOS)
-# API key saved to C:\Users\You\.carsxe\config.json   (Windows)
-# Key: abc1...3xyz
-
-carsxe config get-key
-# Source : ~/.carsxe/config.json
-# Key    : abc1...3xyz
-
-carsxe config remove-key
-# API key removed.
 ```
 
 ---
