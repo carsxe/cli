@@ -114,9 +114,8 @@ program
       const { apiKey, teamName } = await browserLogin({
         onOpen: async (url) => {
           await openBrowser(url);
-          console.log(
-            "Opening browser to authorize... waiting for confirmation",
-          );
+          console.log(`Authorize here: ${url}`);
+          console.log("Waiting for browser confirmation...");
         },
       });
 
