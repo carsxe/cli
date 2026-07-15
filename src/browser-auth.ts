@@ -13,7 +13,7 @@
 
 import * as crypto from "crypto";
 
-const DEFAULT_BASE_URL = "https://api.carsxe.com";
+const DEFAULT_BASE_URL = "https://carsxe.com";
 // ─── Local development ───────────────────────────────────────────────────────
 // To test the login flow locally, change DEFAULT_BASE_URL to your local server:
 //   const DEFAULT_BASE_URL = "http://localhost:3000";
@@ -27,7 +27,7 @@ const MAX_CONSECUTIVE_ERRORS = 5;
 
 export interface BrowserLoginOptions {
   /**
-   * Override the base URL. Defaults to https://api.carsxe.com.
+   * Override the base URL. Defaults to https://carsxe.com.
    * Useful for local development: set to "http://localhost:3000".
    */
   baseUrl?: string;
@@ -149,6 +149,6 @@ export async function browserLogin(
 
   throw new Error(
     "Login timed out after 5 minutes. " +
-      "Please try again or set your API key manually: https://api.carsxe.com/dashboard/developer",
+      "Please try again or set your API key manually: https://carsxe.com/dashboard/developer",
   );
 }

@@ -1,6 +1,6 @@
 # CarsXE CLI
 
-Command-line interface for the [CarsXE API](https://api.carsxe.com). Query vehicle specs, market value, history, recalls, license plates, OBD codes, and more — directly from your terminal or AI agent.
+Command-line interface for the [CarsXE API](https://carsxe.com). Query vehicle specs, market value, history, recalls, license plates, OBD codes, and more — directly from your terminal or AI agent.
 
 ## Requirements
 
@@ -26,11 +26,11 @@ Run once and your API key is saved automatically:
 carsxe login
 ```
 
-This opens your browser to [api.carsxe.com](https://api.carsxe.com), authenticates you, and saves your key to `~/.carsxe/config.json`. It is used automatically for every command from that point on.
+This opens your browser to [carsxe.com](https://carsxe.com), authenticates you, and saves your key to `~/.carsxe/config.json`. It is used automatically for every command from that point on.
 
 ### Option 2 — Set the key manually
 
-Paste your API key from [api.carsxe.com/dashboard/developer](https://api.carsxe.com/dashboard/developer):
+Paste your API key from [carsxe.com/dashboard/developer](https://carsxe.com/dashboard/developer):
 
 ```bash
 carsxe config set-key YOUR_API_KEY
@@ -83,7 +83,7 @@ Authorize via browser and save your API key automatically.
 carsxe login
 ```
 
-Opens [api.carsxe.com/cli-auth](https://api.carsxe.com/cli-auth) in your browser. Sign in with your CarsXE account, the tab closes itself, and your API key is saved to `~/.carsxe/config.json` — no copy-pasting needed.
+Opens [carsxe.com/cli-auth](https://carsxe.com/cli-auth) in your browser. Sign in with your CarsXE account, the tab closes itself, and your API key is saved to `~/.carsxe/config.json` — no copy-pasting needed.
 
 Works on Windows, macOS, Linux, and WSL.
 
@@ -426,4 +426,4 @@ carsxe --raw specs --vin 1HGBH41JXMN109186 | ConvertFrom-Json | Select-Object -E
 
 ## License
 
-MIT — [CarsXE](https://api.carsxe.com)
+MIT — [CarsXE](https://carsxe.com)
