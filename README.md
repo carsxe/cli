@@ -117,6 +117,72 @@ carsxe config remove-key
 
 ---
 
+### `monitors` — Monitoring Watchlists
+
+Create and manage Monitoring watchlists (scheduled product checks and alert delivery). See [Monitoring docs](https://docs.carsxe.com/docs/products/monitors) and the [Agents guide](https://docs.carsxe.com/docs/guides/agents).
+
+```bash
+carsxe monitors list
+carsxe monitors get <id>
+carsxe monitors create --name <name> --vehicle-type vin --vehicle <vin> --product recalls --frequency daily --delivery email
+carsxe monitors update <id> [--name <name>] [--status active|paused] [--pause] [--resume]
+carsxe monitors delete <id>
+carsxe monitors import <id> --vehicle <vin> [--file vehicles.csv]
+carsxe monitors run <id>
+carsxe monitors alerts [id]
+```
+
+| Subcommand        | Description                                              |
+| ----------------- | -------------------------------------------------------- |
+| `list`            | List watchlists for this API key                         |
+| `get <id>`        | Get one watchlist                                        |
+| `create`          | Create a watchlist                                       |
+| `update <id>`     | Patch a watchlist (name, vehicles, schedule, pause/resume) |
+| `delete <id>`     | Delete a watchlist                                       |
+| `import <id>`     | Import vehicles from flags, CSV, or JSON                 |
+| `run <id>`        | Run the watchlist immediately                            |
+| `alerts [id]`     | List recent alerts (account-wide, or one watchlist)      |
+
+**Create options:**
+
+| Option                       | Required | Description                                              |
+| ---------------------------- | -------- | -------------------------------------------------------- |
+| `--name <name>`              | Yes*     | Watchlist name                                           |
+| `--vehicle-type <type>`      | No       | Identifier type: `vin` \| `plate`                        |
+| `--vehicle <id>`             | No       | Vehicle identifier (repeatable)                          |
+| `--vehicles <ids>`           | No       | Comma-separated vehicle identifiers                      |
+| `--product <name>`           | No       | Product to monitor, e.g. `recalls` (repeatable)          |
+| `--products <names>`         | No       | Comma-separated products                                 |
+| `--frequency <frequency>`    | No       | Schedule: `daily` \| `weekly` \| `monthly`               |
+| `--delivery <channel>`       | No       | Delivery channel, e.g. `email` (repeatable)              |
+| `--status <status>`          | No       | `active` \| `paused`                                     |
+| `--json <json>`              | No       | Full JSON body, `.json` file path, or `-` for stdin      |
+
+\*`--name` is required unless it is included in `--json`.
+
+**Examples:**
+
+```bash
+# Create a daily recall watchlist
+carsxe monitors create \
+  --name Fleet \
+  --vehicle-type vin \
+  --vehicle 1C4JJXR64PW696340 \
+  --product recalls \
+  --frequency daily \
+  --delivery email
+
+# Same create via JSON body
+carsxe monitors create --json '{"name":"Fleet","vehicleType":"vin","vehicles":["1C4JJXR64PW696340"],"products":["recalls"],"schedule":{"frequency":"daily"},"delivery":["email"]}'
+
+# Pause, run now, then list alerts for that watchlist
+carsxe monitors update mon_123 --pause
+carsxe monitors run mon_123
+carsxe monitors alerts mon_123
+```
+
+---
+
 ### `specs` — Vehicle Specifications
 
 Decode a VIN and get full vehicle specifications (make, model, year, engine, trim, equipment, and more).
