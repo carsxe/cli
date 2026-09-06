@@ -10,7 +10,7 @@
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
-    "test": "echo \"No tests yet\"",
+    "test": "tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run build"
   },
