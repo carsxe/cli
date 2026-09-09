@@ -33,6 +33,60 @@ export type APITypes = {
     model: string,
     trim?: string,
   ): Promise<unknown>;
+  recallsYmm(
+    key: string,
+    year: string,
+    make: string,
+    model: string,
+  ): Promise<unknown>;
+  recallsBatchSubmit(
+    key: string,
+    body: {
+      vins?: string[];
+      csv?: string;
+      csvUrl?: string;
+      webhookUrl?: string;
+    },
+  ): Promise<unknown>;
+  recallsBatchStatus(key: string, batchId: string): Promise<unknown>;
+  recallsBatchResults(key: string, batchId: string): Promise<unknown>;
+  recallsBatchDownload(key: string, batchId: string): Promise<string>;
+  ymmOptions(
+    key: string,
+    dimension?: string,
+    year?: string,
+    make?: string,
+    model?: string,
+    trim?: string,
+  ): Promise<unknown>;
+  ownershipVin(key: string, vin: string, include?: string): Promise<unknown>;
+  ownershipPerson(
+    key: string,
+    firstName: string,
+    lastName: string,
+    address: string,
+    zip: string,
+    include?: string,
+  ): Promise<unknown>;
+  ownershipAddress(
+    key: string,
+    address: string,
+    zip: string,
+    include?: string,
+    variant?: string,
+  ): Promise<unknown>;
+  ownershipZip(
+    key: string,
+    zip: string,
+    gender?: string,
+    minAge?: string,
+    maxAge?: string,
+    income?: string,
+    page?: string,
+    limit?: string,
+    include?: string,
+    variant?: string,
+  ): Promise<unknown>;
   images(
     key: string,
     make: string,

@@ -55,6 +55,27 @@ async function run(
   }
 }
 
+function formatOpts(cmd: Command): { raw: boolean; table: boolean } {
+  const opts = cmd.optsWithGlobals() as { raw?: boolean; table?: boolean };
+  return { raw: Boolean(opts.raw), table: Boolean(opts.table) };
+}
+
+function collectVin(value: string, previous: string[]): string[] {
+  return previous.concat(value);
+}
+
+async function runText(fn: (key: string) => Promise<string>): Promise<void> {
+  try {
+    const result = await fn(resolveKey());
+    process.stdout.write(result);
+    if (!result.endsWith("\n")) process.stdout.write("\n");
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`Error: ${msg}`);
+    process.exit(1);
+  }
+}
+
 // ── Global options ─────────────────────────────────────────────────────────
 
 /**
@@ -252,6 +273,89 @@ program
     await run((k) => api.recalls(k, opts.vin), raw, table);
   });
 
+// ── recalls-ymm ────────────────────────────────────────────────────────────
+
+program
+  .command("recalls-ymm")
+  .description("Get safety recalls by year, make, and model (no VIN required)")
+  .requiredOption("--year <year>", "Vehicle year (e.g. 2023)")
+  .requiredOption("--make <make>", "Vehicle make (e.g. Toyota)")
+  .requiredOption("--model <model>", "Vehicle model (e.g. Camry)")
+  .action(async (opts, cmd) => {
+    const { raw, table } = formatOpts(cmd);
+    await run(
+      (k) => api.recallsYmm(k, opts.year, opts.make, opts.model),
+      raw,
+      table,
+    );
+  });
+
+// ── recalls-batch ──────────────────────────────────────────────────────────
+
+const recallsBatch = program
+  .command("recalls-batch")
+  .description("Submit and retrieve bulk recall checks (up to 10,000 VINs)");
+
+recallsBatch
+  .command("submit")
+  .description("Submit a bulk recalls batch (vins, csv, and/or csv-url)")
+  .option(
+    "--vin <vin>",
+    "VIN to include (repeatable)",
+    collectVin,
+    [] as string[],
+  )
+  .option("--csv <csv>", "Inline CSV of VINs (one per line or a vin column)")
+  .option("--csv-url <url>", "HTTPS URL to a CSV file of VINs")
+  .option("--webhook-url <url>", "HTTPS webhook URL when the batch finishes")
+  .action(async (opts, cmd) => {
+    const vins = (opts.vin as string[]).filter(Boolean);
+    if (!vins.length && !opts.csv && !opts.csvUrl) {
+      console.error(
+        "Error: Provide at least one of --vin, --csv, or --csv-url",
+      );
+      process.exit(1);
+    }
+    const { raw, table } = formatOpts(cmd);
+    await run(
+      (k) =>
+        api.recallsBatchSubmit(k, {
+          vins: vins.length ? vins : undefined,
+          csv: opts.csv,
+          csvUrl: opts.csvUrl,
+          webhookUrl: opts.webhookUrl,
+        }),
+      raw,
+      table,
+    );
+  });
+
+recallsBatch
+  .command("status")
+  .description("Check the status of a bulk recalls batch")
+  .requiredOption("--batch-id <id>", "Batch ID returned by submit")
+  .action(async (opts, cmd) => {
+    const { raw, table } = formatOpts(cmd);
+    await run((k) => api.recallsBatchStatus(k, opts.batchId), raw, table);
+  });
+
+recallsBatch
+  .command("results")
+  .description("Fetch completed bulk recalls results as JSON")
+  .requiredOption("--batch-id <id>", "Batch ID returned by submit")
+  .action(async (opts, cmd) => {
+    const { raw, table } = formatOpts(cmd);
+    await run((k) => api.recallsBatchResults(k, opts.batchId), raw, table);
+  });
+
+recallsBatch
+  .command("download")
+  .description("Download completed bulk recalls results as CSV")
+  .requiredOption("--batch-id <id>", "Batch ID returned by submit")
+  .action(async (opts) => {
+    await runText((k) => api.recallsBatchDownload(k, opts.batchId));
+  });
+
 // ── international-vin ──────────────────────────────────────────────────────
 
 program
@@ -337,6 +441,155 @@ program
     const { raw, table } = cmd.parent.opts();
     await run(
       (k) => api.ymm(k, opts.year, opts.make, opts.model, opts.trim),
+      raw,
+      table,
+    );
+  });
+
+// ── ymm-options ────────────────────────────────────────────────────────────
+
+program
+  .command("ymm-options")
+  .description(
+    "List year / make / model / trim / variant options for dropdowns",
+  )
+  .option(
+    "--dimension <dimension>",
+    "years | makes | models | trims | variants",
+  )
+  .option("--year <year>", "Filter by model year")
+  .option("--make <make>", "Filter by make (required for models)")
+  .option("--model <model>", "Filter by model (required for trims)")
+  .option("--trim <trim>", "Substring filter on trim or variant names")
+  .action(async (opts, cmd) => {
+    const { raw, table } = formatOpts(cmd);
+    await run(
+      (k) =>
+        api.ymmOptions(
+          k,
+          opts.dimension,
+          opts.year,
+          opts.make,
+          opts.model,
+          opts.trim,
+        ),
+      raw,
+      table,
+    );
+  });
+
+// ── ownership (enterprise) ─────────────────────────────────────────────────
+
+const INCLUDE_HELP =
+  "Comma-separated subset of demographics,emails,phones,vehicle_history";
+
+const ownership = program
+  .command("ownership")
+  .description(
+    "Look up registered owners and residents (Enterprise plans only)",
+  );
+
+ownership
+  .command("vin")
+  .description("Look up registered owner(s) by VIN")
+  .requiredOption("--vin <vin>", "Vehicle Identification Number")
+  .option("--include <include>", INCLUDE_HELP)
+  .action(async (opts, cmd) => {
+    const { raw, table } = formatOpts(cmd);
+    await run((k) => api.ownershipVin(k, opts.vin, opts.include), raw, table);
+  });
+
+ownership
+  .command("person")
+  .description("Look up a person by name and address")
+  .requiredOption("--first-name <name>", "First name (max 50 characters)")
+  .requiredOption("--last-name <name>", "Last name (max 50 characters)")
+  .requiredOption(
+    "--address <address>",
+    "Street address only, no city/state (max 100 characters)",
+  )
+  .requiredOption("--zip <zip>", "5-digit US ZIP, optionally ZIP+4")
+  .option("--include <include>", INCLUDE_HELP)
+  .action(async (opts, cmd) => {
+    const { raw, table } = formatOpts(cmd);
+    await run(
+      (k) =>
+        api.ownershipPerson(
+          k,
+          opts.firstName,
+          opts.lastName,
+          opts.address,
+          opts.zip,
+          opts.include,
+        ),
+      raw,
+      table,
+    );
+  });
+
+ownership
+  .command("address")
+  .description("Look up residents at a street address")
+  .requiredOption(
+    "--address <address>",
+    "Street address only, no city/state (max 100 characters)",
+  )
+  .requiredOption("--zip <zip>", "5-digit US ZIP, optionally ZIP+4")
+  .option("--include <include>", INCLUDE_HELP)
+  .option(
+    "--variant <variant>",
+    "Legacy alias (vehicle_history or compliance); prefer --include",
+  )
+  .action(async (opts, cmd) => {
+    const { raw, table } = formatOpts(cmd);
+    await run(
+      (k) =>
+        api.ownershipAddress(
+          k,
+          opts.address,
+          opts.zip,
+          opts.include,
+          opts.variant,
+        ),
+      raw,
+      table,
+    );
+  });
+
+ownership
+  .command("zip")
+  .description("Search people in a ZIP with optional filters")
+  .requiredOption("--zip <zip>", "Exactly 5-digit US ZIP")
+  .option("--gender <gender>", "M or F")
+  .option("--min-age <age>", "Minimum age (whole number)")
+  .option("--max-age <age>", "Maximum age (whole number)")
+  .option(
+    "--income <income>",
+    "Income code or label (e.g. F, K, $50,000–$59,999)",
+  )
+  .option("--page <page>", "Page number (default 1)")
+  .option("--limit <limit>", "Page size (default 15, max 100)")
+  .option("--include <include>", INCLUDE_HELP)
+  .option(
+    "--variant <variant>",
+    "Legacy alias (vehicle_history); prefer --include",
+  )
+  .action(async (opts, cmd) => {
+    const { raw, table } = formatOpts(cmd);
+    await run(
+      (k) =>
+        api.ownershipZip(
+          k,
+          opts.zip,
+          opts.gender,
+          opts.minAge,
+          opts.maxAge,
+          opts.income,
+          opts.page,
+          opts.limit,
+          opts.include,
+          opts.variant,
+        ),
       raw,
       table,
     );

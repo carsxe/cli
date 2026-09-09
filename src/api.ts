@@ -52,7 +52,7 @@ async function doGet(
 async function doPost(
   apiKey: string,
   endpoint: string,
-  body: Record<string, string>,
+  body: Record<string, unknown>,
 ): Promise<unknown> {
   const url = buildUrl(endpoint, apiKey);
   const controller = new AbortController();
@@ -70,6 +70,24 @@ async function doPost(
   }
   if (!res.ok) return throwWithBody(res);
   return res.json();
+}
+
+async function doGetText(
+  apiKey: string,
+  endpoint: string,
+  params: Params = {},
+): Promise<string> {
+  const url = buildUrl(endpoint, apiKey, params);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  let res: Response;
+  try {
+    res = await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+  if (!res.ok) return throwWithBody(res);
+  return res.text();
 }
 
 export const api: APITypes = {
@@ -126,6 +144,101 @@ export const api: APITypes = {
   },
   ymm(key: string, year: string, make: string, model: string, trim?: string) {
     return doGet(key, "v1/ymm", { year, make, model, trim });
+  },
+  recallsYmm(key: string, year: string, make: string, model: string) {
+    return doGet(key, "v1/recalls-ymm", { year, make, model });
+  },
+  recallsBatchSubmit(
+    key: string,
+    body: {
+      vins?: string[];
+      csv?: string;
+      csvUrl?: string;
+      webhookUrl?: string;
+    },
+  ) {
+    const payload: Record<string, unknown> = {};
+    if (body.vins !== undefined) payload.vins = body.vins;
+    if (body.csv !== undefined) payload.csv = body.csv;
+    if (body.csvUrl !== undefined) payload.csvUrl = body.csvUrl;
+    if (body.webhookUrl !== undefined) payload.webhookUrl = body.webhookUrl;
+    return doPost(key, "v1/recalls-batch/submit", payload);
+  },
+  recallsBatchStatus(key: string, batchId: string) {
+    return doGet(key, "v1/recalls-batch/status", { batchId });
+  },
+  recallsBatchResults(key: string, batchId: string) {
+    return doGet(key, "v1/recalls-batch/results", { batchId });
+  },
+  recallsBatchDownload(key: string, batchId: string) {
+    return doGetText(key, "v1/recalls-batch/download", { batchId });
+  },
+  ymmOptions(
+    key: string,
+    dimension?: string,
+    year?: string,
+    make?: string,
+    model?: string,
+    trim?: string,
+  ) {
+    return doGet(key, "v1/ymm-options", { dimension, year, make, model, trim });
+  },
+  ownershipVin(key: string, vin: string, include?: string) {
+    return doGet(key, "v1/ownership/vin", { vin, include });
+  },
+  ownershipPerson(
+    key: string,
+    firstName: string,
+    lastName: string,
+    address: string,
+    zip: string,
+    include?: string,
+  ) {
+    return doGet(key, "v1/ownership/person", {
+      first_name: firstName,
+      last_name: lastName,
+      address,
+      zip,
+      include,
+    });
+  },
+  ownershipAddress(
+    key: string,
+    address: string,
+    zip: string,
+    include?: string,
+    variant?: string,
+  ) {
+    return doGet(key, "v1/ownership/address", {
+      address,
+      zip,
+      include,
+      variant,
+    });
+  },
+  ownershipZip(
+    key: string,
+    zip: string,
+    gender?: string,
+    minAge?: string,
+    maxAge?: string,
+    income?: string,
+    page?: string,
+    limit?: string,
+    include?: string,
+    variant?: string,
+  ) {
+    return doGet(key, "v1/ownership/zip", {
+      zip,
+      gender,
+      min_age: minAge,
+      max_age: maxAge,
+      income,
+      page,
+      limit,
+      include,
+      variant,
+    });
   },
   images(
     key: string,
