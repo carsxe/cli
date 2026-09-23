@@ -31,45 +31,58 @@ async function throwWithBody(res: Response): Promise<never> {
   throw new Error(`HTTP ${res.status} ${res.statusText}${detail}`);
 }
 
+async function parseResponse(res: Response): Promise<unknown> {
+  if (res.status === 204) return { success: true };
+  const text = await res.text();
+  if (!text) return { success: true };
+  return JSON.parse(text) as unknown;
+}
+
+async function request(
+  method: "GET" | "POST" | "PATCH" | "DELETE",
+  apiKey: string,
+  endpoint: string,
+  options: { params?: Params; body?: unknown } = {},
+): Promise<unknown> {
+  const url = buildUrl(endpoint, apiKey, options.params);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const init: RequestInit = { method, signal: controller.signal };
+  if (options.body !== undefined) {
+    init.headers = { "Content-Type": "application/json" };
+    init.body = JSON.stringify(options.body);
+  }
+  let res: Response;
+  try {
+    res = await fetch(url, init);
+  } finally {
+    clearTimeout(timer);
+  }
+  if (!res.ok) return throwWithBody(res);
+  return parseResponse(res);
+}
+
 async function doGet(
   apiKey: string,
   endpoint: string,
   params: Params = {},
 ): Promise<unknown> {
-  const url = buildUrl(endpoint, apiKey, params);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-  let res: Response;
-  try {
-    res = await fetch(url, { signal: controller.signal });
-  } finally {
-    clearTimeout(timer);
-  }
-  if (!res.ok) return throwWithBody(res);
-  return res.json();
+  return request("GET", apiKey, endpoint, { params });
 }
 
 async function doPost(
   apiKey: string,
   endpoint: string,
-  body: Record<string, string>,
+  body: unknown,
 ): Promise<unknown> {
-  const url = buildUrl(endpoint, apiKey);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-  let res: Response;
-  try {
-    res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
-  } finally {
-    clearTimeout(timer);
-  }
-  if (!res.ok) return throwWithBody(res);
-  return res.json();
+  return request("POST", apiKey, endpoint, { body });
+}
+
+function monitorPath(id?: string, suffix?: string): string {
+  const segments = ["v1/monitors"];
+  if (id !== undefined) segments.push(encodeURIComponent(id));
+  if (suffix) segments.push(suffix);
+  return segments.join("/");
 }
 
 export const api: APITypes = {
@@ -151,5 +164,29 @@ export const api: APITypes = {
   },
   obd(key: string, code: string) {
     return doGet(key, "obdcodesdecoder", { code });
+  },
+  listMonitors(key: string) {
+    return doGet(key, monitorPath());
+  },
+  getMonitor(key: string, id: string) {
+    return doGet(key, monitorPath(id));
+  },
+  createMonitor(key: string, body: unknown) {
+    return doPost(key, monitorPath(), body);
+  },
+  updateMonitor(key: string, id: string, body: unknown) {
+    return request("PATCH", key, monitorPath(id), { body });
+  },
+  deleteMonitor(key: string, id: string) {
+    return request("DELETE", key, monitorPath(id));
+  },
+  importMonitorVehicles(key: string, id: string, body: unknown) {
+    return doPost(key, monitorPath(id, "import"), body);
+  },
+  runMonitor(key: string, id: string) {
+    return doPost(key, monitorPath(id, "run"), {});
+  },
+  listMonitorAlerts(key: string, id?: string) {
+    return doGet(key, monitorPath(id, "alerts"));
   },
 };

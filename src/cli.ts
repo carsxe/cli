@@ -11,7 +11,15 @@ import {
   removeSavedKey,
   setSavedKey,
 } from "./config";
+import {
+  assertCreateBody,
+  assertUpdateBody,
+  buildMonitorImportBody,
+  buildMonitorWriteBody,
+} from "./monitor-input";
 import { renderTable } from "./table";
+
+const MONITOR_DOCS = "https://docs.carsxe.com/docs/products/monitors";
 
 const program = new Command();
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -36,6 +44,36 @@ function output(data: unknown, raw: boolean, table: boolean): void {
   } else {
     console.log(raw ? JSON.stringify(data) : JSON.stringify(data, null, 2));
   }
+}
+
+function collect(value: string, previous: string[]): string[] {
+  return [...previous, value];
+}
+
+function outputOpts(cmd: Command): { raw: boolean; table: boolean } {
+  let raw = false;
+  let table = false;
+  let current: Command | null = cmd;
+  while (current) {
+    const opts = current.opts() as { raw?: boolean; table?: boolean };
+    if (opts.raw) raw = true;
+    if (opts.table) table = true;
+    current = current.parent;
+  }
+  return { raw, table };
+}
+
+function addOutputOptions(cmd: Command): Command {
+  return cmd
+    .addOption(
+      new Option("--raw", "Output compact single-line JSON").hideHelp(),
+    )
+    .addOption(
+      new Option(
+        "--table",
+        "Output as a formatted table instead of JSON",
+      ).hideHelp(),
+    );
 }
 
 async function run(
@@ -389,9 +427,183 @@ program
     await run((k) => api.obd(k, opts.code), raw, table);
   });
 
-// ── Parse ──────────────────────────────────────────────────────────────────
+// ── monitors ───────────────────────────────────────────────────────────────
 
-program.parseAsync().catch((err) => {
-  console.error(err);
-  process.exitCode = 1;
-});
+const monitors = program
+  .command("monitors")
+  .description("Manage Monitoring watchlists")
+  .addHelpText(
+    "after",
+    "\nDocs: " +
+      MONITOR_DOCS +
+      "\nAlso: https://docs.carsxe.com/docs/guides/agents\n",
+  );
+
+addOutputOptions(
+  monitors
+    .command("list")
+    .description("List Monitoring watchlists for this API key")
+    .addHelpText("after", `\nDocs: ${MONITOR_DOCS}\n`)
+    .action(async (_opts, cmd) => {
+      const { raw, table } = outputOpts(cmd);
+      await run((k) => api.listMonitors(k), raw, table);
+    }),
+);
+
+addOutputOptions(
+  monitors
+    .command("get <id>")
+    .description("Get a Monitoring watchlist by id")
+    .addHelpText("after", `\nDocs: ${MONITOR_DOCS}\n`)
+    .action(async (id: string, _opts, cmd) => {
+      const { raw, table } = outputOpts(cmd);
+      await run((k) => api.getMonitor(k, id), raw, table);
+    }),
+);
+
+addOutputOptions(
+  monitors
+    .command("create")
+    .description("Create a Monitoring watchlist")
+    .option("--name <name>", "Watchlist name")
+    .option("--vehicle-type <type>", "Vehicle identifier type: vin | plate")
+    .option("--vehicle <id>", "Vehicle identifier (repeatable)", collect, [])
+    .option("--vehicles <ids>", "Comma-separated vehicle identifiers")
+    .option("--product <name>", "Product to monitor (repeatable)", collect, [])
+    .option("--products <names>", "Comma-separated products (e.g. recalls)")
+    .option(
+      "--frequency <frequency>",
+      "Schedule frequency: daily | weekly | monthly",
+    )
+    .option(
+      "--delivery <channel>",
+      "Delivery channel (repeatable, e.g. email)",
+      collect,
+      [],
+    )
+    .option("--status <status>", "Watchlist status: active | paused")
+    .option("--json <json>", "JSON body, file path, or '-' for stdin")
+    .addHelpText(
+      "after",
+      `\nDocs: ${MONITOR_DOCS}\n\nExample:\n` +
+        "  carsxe monitors create --name Fleet --vehicle-type vin" +
+        " --vehicle 1C4JJXR64PW696340 --product recalls" +
+        " --frequency daily --delivery email\n",
+    )
+    .action(async (opts, cmd) => {
+      const { raw, table } = outputOpts(cmd);
+      await run((k) => {
+        const body = buildMonitorWriteBody(opts);
+        assertCreateBody(body);
+        return api.createMonitor(k, body);
+      }, raw, table);
+    }),
+);
+
+addOutputOptions(
+  monitors
+    .command("update <id>")
+    .description("Update a Monitoring watchlist (including pause/resume)")
+    .option("--name <name>", "Watchlist name")
+    .option("--vehicle-type <type>", "Vehicle identifier type: vin | plate")
+    .option(
+      "--vehicle <id>",
+      "Replace vehicle identifiers (repeatable)",
+      collect,
+      [],
+    )
+    .option("--vehicles <ids>", "Replace vehicles (comma-separated)")
+    .option("--product <name>", "Replace products (repeatable)", collect, [])
+    .option("--products <names>", "Replace products (comma-separated)")
+    .option(
+      "--frequency <frequency>",
+      "Schedule frequency: daily | weekly | monthly",
+    )
+    .option(
+      "--delivery <channel>",
+      "Replace delivery channels (repeatable)",
+      collect,
+      [],
+    )
+    .option("--status <status>", "Watchlist status: active | paused")
+    .option("--pause", "Pause the watchlist (status=paused)")
+    .option("--resume", "Resume the watchlist (status=active)")
+    .option("--json <json>", "JSON body, file path, or '-' for stdin")
+    .addHelpText("after", `\nDocs: ${MONITOR_DOCS}\n`)
+    .action(async (id: string, opts, cmd) => {
+      const { raw, table } = outputOpts(cmd);
+      await run((k) => {
+        const body = buildMonitorWriteBody(opts);
+        assertUpdateBody(body);
+        return api.updateMonitor(k, id, body);
+      }, raw, table);
+    }),
+);
+
+addOutputOptions(
+  monitors
+    .command("delete <id>")
+    .description("Delete a Monitoring watchlist")
+    .addHelpText("after", `\nDocs: ${MONITOR_DOCS}\n`)
+    .action(async (id: string, _opts, cmd) => {
+      const { raw, table } = outputOpts(cmd);
+      await run((k) => api.deleteMonitor(k, id), raw, table);
+    }),
+);
+
+addOutputOptions(
+  monitors
+    .command("import <id>")
+    .description("Import vehicles into a Monitoring watchlist")
+    .option("--vehicle <id>", "Vehicle identifier (repeatable)", collect, [])
+    .option("--vehicles <ids>", "Comma-separated vehicle identifiers")
+    .option("--file <path>", "CSV or newline-separated vehicle list")
+    .option("--json <json>", "JSON body, file path, or '-' for stdin")
+    .addHelpText("after", `\nDocs: ${MONITOR_DOCS}\n`)
+    .action(async (id: string, opts, cmd) => {
+      const { raw, table } = outputOpts(cmd);
+      await run((k) => {
+        const body = buildMonitorImportBody(opts);
+        return api.importMonitorVehicles(k, id, body);
+      }, raw, table);
+    }),
+);
+
+addOutputOptions(
+  monitors
+    .command("run <id>")
+    .description("Run a Monitoring watchlist immediately")
+    .addHelpText(
+      "after",
+      `\nDocs: ${MONITOR_DOCS}\n\nExample:\n  carsxe monitors run <id>\n`,
+    )
+    .action(async (id: string, _opts, cmd) => {
+      const { raw, table } = outputOpts(cmd);
+      await run((k) => api.runMonitor(k, id), raw, table);
+    }),
+);
+
+addOutputOptions(
+  monitors
+    .command("alerts [id]")
+    .description("List recent Monitoring alerts (account-wide or one watchlist)")
+    .addHelpText("after", `\nDocs: ${MONITOR_DOCS}\n`)
+    .action(async (id: string | undefined, _opts, cmd) => {
+      const { raw, table } = outputOpts(cmd);
+      await run((k) => api.listMonitorAlerts(k, id), raw, table);
+    }),
+);
+
+export { program };
+
+function isEntrypoint(): boolean {
+  const entry = process.argv[1] ?? "";
+  return /(?:^|[\\/])cli\.(ts|js)$/.test(entry);
+}
+
+if (isEntrypoint()) {
+  program.parseAsync().catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  });
+}

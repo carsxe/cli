@@ -45,4 +45,12 @@ export type APITypes = {
     size?: string,
   ): Promise<unknown>;
   obd(key: string, code: string): Promise<unknown>;
+  listMonitors(key: string): Promise<unknown>;
+  getMonitor(key: string, id: string): Promise<unknown>;
+  createMonitor(key: string, body: unknown): Promise<unknown>;
+  updateMonitor(key: string, id: string, body: unknown): Promise<unknown>;
+  deleteMonitor(key: string, id: string): Promise<unknown>;
+  importMonitorVehicles(key: string, id: string, body: unknown): Promise<unknown>;
+  runMonitor(key: string, id: string): Promise<unknown>;
+  listMonitorAlerts(key: string, id?: string): Promise<unknown>;
 };
