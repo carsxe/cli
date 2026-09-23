@@ -281,7 +281,7 @@ carsxe plate-image --image <url>
 **Example:**
 
 ```bash
-carsxe plate-image --image https://example.com/car-photo.jpg
+carsxe plate-image --image https://imagedelivery.net/moyiiSImjJPI_EZVxNMBBw/f49aed53-d736-4370-f3f4-97418841c800/public <!-- pragma: allowlist secret -->
 ```
 
 ---
@@ -301,7 +301,7 @@ carsxe vin-ocr --image <url>
 **Example:**
 
 ```bash
-carsxe vin-ocr --image https://example.com/vin-sticker.jpg
+carsxe vin-ocr --image https://imagedelivery.net/moyiiSImjJPI_EZVxNMBBw/base/images/vin-ocr/vin/public <!-- pragma: allowlist secret -->
 ```
 
 ---
